@@ -5,13 +5,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/RoshiSecOps/goATED-tracker/internal/database"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
+
+type apiConfig struct {
+	db *database.Queries
+}
 
 func main() {
 	err := godotenv.Load()
@@ -32,17 +34,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 	mux.HandleFunc("POST /api/users", apiCfg.createUserHandler)
+	mux.HandleFunc("DELETE /api/users", apiCfg.wipeUsers)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()
-}
-
-type apiConfig struct {
-	db *database.Queries
-}
-
-type User struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Username  string    `json:"username"`
 }

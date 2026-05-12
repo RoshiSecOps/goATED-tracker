@@ -31,3 +31,12 @@ func (q *Queries) CreateUser(ctx context.Context, username string) (User, error)
 	)
 	return i, err
 }
+
+const wipeUsers = `-- name: WipeUsers :exec
+DELETE FROM users
+`
+
+func (q *Queries) WipeUsers(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, wipeUsers)
+	return err
+}

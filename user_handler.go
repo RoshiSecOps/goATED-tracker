@@ -5,7 +5,17 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 )
+
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Username  string    `json:"username"`
+}
 
 func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
@@ -34,4 +44,14 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 		UpdatedAt: user.UpdatedAt,
 		Username:  user.Username,
 	})
+}
+
+func (cfg *apiConfig) wipeUsers(w http.ResponseWriter, r *http.Request) {
+	err := cfg.db.WipeUsers(r.Context())
+	if err != nil {
+		respondWithError(w, 500, "could not delete users")
+		log.Printf("error wiping users: %v", err)
+		return
+	}
+	respondWithJSON(w, 200, "users successfully reset")
 }
