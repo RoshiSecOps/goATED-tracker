@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/RoshiSecOps/goATED-tracker/internal/auth"
+	"github.com/RoshiSecOps/goATED-tracker/internal/database"
 	"github.com/google/uuid"
 )
 
@@ -20,6 +22,7 @@ type User struct {
 func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Username string `json:"username"`
+		Password string `json:"password"`
 	}
 	dat, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -32,7 +35,18 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 		respondWithError(w, 500, "unable to unmarshal data")
 		return
 	}
-	user, err := cfg.db.CreateUser(r.Context(), params.Username)
+	if len(params.Password) == 0 {
+		respondWithError(w, 400, "password cannot be empty")
+		return
+	}
+	passHash, err := auth.HashPassword(params.Password)
+	if err != nil {
+		respondWithError(w, 500, "unable to hash password")
+		return
+	}
+	user, err := cfg.db.CreateUser(r.Context(), database.CreateUserParams{
+		Username: params.Username, Passwordhash: passHash,
+	})
 	if err != nil {
 		respondWithError(w, 500, "unable to create user")
 		log.Printf("Error: %v", err)
