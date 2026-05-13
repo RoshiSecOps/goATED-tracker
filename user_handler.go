@@ -96,16 +96,19 @@ func (cfg *apiConfig) userLogin(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 400, "password cannot be empty")
 		return
 	}
-	passHash, err := auth.HashPassword(params.Password)
+	user, err := cfg.db.GetUserByName(r.Context(), params.Username)
 	if err != nil {
-		respondWithError(w, 500, "unable to hash password")
+		respondWithError(w, 400, "unable to get user")
+	}
+	match, err := auth.CheckPasswordHash(params.Password, user.Passwordhash)
+	if err != nil {
+		respondWithError(w, 400, "wrong credentials")
 		return
 	}
-	user, err := cfg.db.GetUserByNameAndPass(r.Context(), database.GetUserByNameAndPassParams{
-		Username:     params.Username,
-		Passwordhash: passHash,
-	})
-
+	if match != true {
+		respondWithError(w, 400, "wrong credentials")
+		return
+	}
 	secret := os.Getenv("JWT_SECRET")
 	expiresIn := time.Hour
 
@@ -116,6 +119,7 @@ func (cfg *apiConfig) userLogin(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		respondWithError(w, 500, "unable to create token")
+		return
 	}
 	respondWithJSON(w, 200, LogedUser{
 		User: User{

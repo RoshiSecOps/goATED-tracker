@@ -39,18 +39,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const getUserByNameAndPass = `-- name: GetUserByNameAndPass :one
+const getUserByName = `-- name: GetUserByName :one
 SELECT id, created_at, updated_at, username, passwordhash FROM users
-WHERE username = $1 and passwordhash = $2
+WHERE username = $1
 `
 
-type GetUserByNameAndPassParams struct {
-	Username     string
-	Passwordhash string
-}
-
-func (q *Queries) GetUserByNameAndPass(ctx context.Context, arg GetUserByNameAndPassParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByNameAndPass, arg.Username, arg.Passwordhash)
+func (q *Queries) GetUserByName(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByName, username)
 	var i User
 	err := row.Scan(
 		&i.ID,
