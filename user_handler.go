@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/RoshiSecOps/goATED-tracker/internal/auth"
@@ -17,6 +18,11 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Username  string    `json:"username"`
+}
+
+type LogedUser struct {
+	User
+	Token string `json:"token"`
 }
 
 func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,4 +74,56 @@ func (cfg *apiConfig) wipeUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJSON(w, 200, "users successfully reset")
+}
+
+func (cfg *apiConfig) userLogin(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	dat, err := io.ReadAll(r.Body)
+	if err != nil {
+		respondWithError(w, 500, "could not read request body")
+		return
+	}
+	params := parameters{}
+	err = json.Unmarshal(dat, &params)
+	if err != nil {
+		respondWithError(w, 500, "unable to unmarshal data")
+		return
+	}
+	if len(params.Password) == 0 {
+		respondWithError(w, 400, "password cannot be empty")
+		return
+	}
+	passHash, err := auth.HashPassword(params.Password)
+	if err != nil {
+		respondWithError(w, 500, "unable to hash password")
+		return
+	}
+	user, err := cfg.db.GetUserByNameAndPass(r.Context(), database.GetUserByNameAndPassParams{
+		Username:     params.Username,
+		Passwordhash: passHash,
+	})
+
+	secret := os.Getenv("JWT_SECRET")
+	expiresIn := time.Hour
+
+	jwtToken, err := auth.MakeJWT(
+		user.ID,
+		secret,
+		expiresIn,
+	)
+	if err != nil {
+		respondWithError(w, 500, "unable to create token")
+	}
+	respondWithJSON(w, 200, LogedUser{
+		User: User{
+			ID:        user.ID,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+			Username:  user.Username,
+		},
+		Token: jwtToken,
+	})
 }

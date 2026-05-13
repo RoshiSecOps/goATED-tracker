@@ -39,6 +39,29 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getUserByNameAndPass = `-- name: GetUserByNameAndPass :one
+SELECT id, created_at, updated_at, username, passwordhash FROM users
+WHERE username = $1 and passwordhash = $2
+`
+
+type GetUserByNameAndPassParams struct {
+	Username     string
+	Passwordhash string
+}
+
+func (q *Queries) GetUserByNameAndPass(ctx context.Context, arg GetUserByNameAndPassParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByNameAndPass, arg.Username, arg.Passwordhash)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Username,
+		&i.Passwordhash,
+	)
+	return i, err
+}
+
 const wipeUsers = `-- name: WipeUsers :exec
 DELETE FROM users
 `

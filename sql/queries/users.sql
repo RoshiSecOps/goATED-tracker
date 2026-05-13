@@ -11,3 +11,7 @@ RETURNING *;
 
 -- name: WipeUsers :exec
 DELETE FROM users;
+
+-- name: GetUserByNameAndPass :one
+SELECT * FROM users
+WHERE username = $1 and passwordhash = $2;
