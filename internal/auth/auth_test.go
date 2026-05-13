@@ -3,6 +3,9 @@ package auth
 import (
 	"net/http"
 	"testing"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 func TestMakeAndValidatePassHash(t *testing.T) {
@@ -69,5 +72,56 @@ func TestWrongHeaderContent(t *testing.T) {
 	token, err := GetBearerToken(req.Header)
 	if err == nil {
 		t.Fatalf("expected error of malformed auth header, got token: %v", token)
+	}
+}
+
+func TestJwtCreateAndValidate(t *testing.T) {
+	userId := uuid.New()
+	secret := "basic"
+	expireIn := 60 * time.Second
+	token, err := MakeJWT(userId, secret, expireIn)
+	if err != nil {
+		t.Fatalf("unable to create token: %v", err)
+	}
+	checkUserId, err := ValidateJWT(token, secret)
+	if err != nil {
+		t.Fatalf("unable to validate token: %v", err)
+	}
+	if userId != checkUserId {
+		t.Errorf("expected decoded ID to equal %v, but go %v", userId, checkUserId)
+	}
+}
+
+func TestJwtExpiration(t *testing.T) {
+	userId := uuid.New()
+	secret := "basic"
+	expireIn := -time.Second
+	token, err := MakeJWT(userId, secret, expireIn)
+	if err != nil {
+		t.Fatalf("unable to create token: %v", err)
+	}
+	checkUserId, err := ValidateJWT(token, secret)
+	if err == nil {
+		t.Errorf("expected expired token error, got nil")
+	}
+	if checkUserId != uuid.Nil {
+		t.Errorf("Expected id to be nil, got %v", checkUserId)
+	}
+}
+
+func TestJwtWrongSecret(t *testing.T) {
+	userId := uuid.New()
+	secret := "basic"
+	expireIn := -time.Second
+	token, err := MakeJWT(userId, secret, expireIn)
+	if err != nil {
+		t.Fatalf("unable to create token: %v", err)
+	}
+	checkUserId, err := ValidateJWT(token, "wrong")
+	if err == nil {
+		t.Errorf("expected error, got nil")
+	}
+	if checkUserId != uuid.Nil {
+		t.Errorf("expected uuid.Nil, got %v", checkUserId)
 	}
 }
