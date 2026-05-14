@@ -31,3 +31,52 @@ func (q *Queries) CreateTeam(ctx context.Context, teamname string) (Team, error)
 	)
 	return i, err
 }
+
+const getAllTeams = `-- name: GetAllTeams :many
+SELECT id, created_at, updated_at, teamname from teams
+`
+
+func (q *Queries) GetAllTeams(ctx context.Context) ([]Team, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTeams)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Team
+	for rows.Next() {
+		var i Team
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Teamname,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTeamByName = `-- name: GetTeamByName :one
+SELECT id, created_at, updated_at, teamname from teams
+Where teamname = $1
+`
+
+func (q *Queries) GetTeamByName(ctx context.Context, teamname string) (Team, error) {
+	row := q.db.QueryRowContext(ctx, getTeamByName, teamname)
+	var i Team
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Teamname,
+	)
+	return i, err
+}

@@ -7,3 +7,10 @@ VALUES (
     $1
 )
 RETURNING *;
+
+-- name: GetAllTeams :many
+SELECT * from teams;
+
+-- name: GetTeamByName :one
+SELECT * from teams
+Where teamname = $1;
