@@ -14,3 +14,6 @@ SELECT * from teams;
 -- name: GetTeamByName :one
 SELECT * from teams
 Where teamname = $1;
+
+-- name: WipeTeams :exec
+DELETE FROM teams;

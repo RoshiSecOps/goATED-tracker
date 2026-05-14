@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/RoshiSecOps/goATED-tracker/internal/database"
 )
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error {
@@ -19,4 +21,13 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 
 func respondWithError(w http.ResponseWriter, code int, msg string) error {
 	return respondWithJSON(w, code, map[string]string{"error": msg})
+}
+
+func databaseTeamtoTeam(dbTeam database.Team) Team {
+	return Team{
+		ID:        dbTeam.ID,
+		CreatedAt: dbTeam.CreatedAt,
+		UpdatedAt: dbTeam.UpdatedAt,
+		Name:      dbTeam.Teamname,
+	}
 }

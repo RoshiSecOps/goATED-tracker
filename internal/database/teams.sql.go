@@ -80,3 +80,12 @@ func (q *Queries) GetTeamByName(ctx context.Context, teamname string) (Team, err
 	)
 	return i, err
 }
+
+const wipeTeams = `-- name: WipeTeams :exec
+DELETE FROM teams
+`
+
+func (q *Queries) WipeTeams(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, wipeTeams)
+	return err
+}

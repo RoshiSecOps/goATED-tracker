@@ -66,7 +66,7 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (cfg *apiConfig) wipeUsers(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) wipeUsersHandler(w http.ResponseWriter, r *http.Request) {
 	err := cfg.db.WipeUsers(r.Context())
 	if err != nil {
 		respondWithError(w, 500, "could not delete users")
@@ -76,7 +76,7 @@ func (cfg *apiConfig) wipeUsers(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, "users successfully reset")
 }
 
-func (cfg *apiConfig) userLogin(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) userLoginHandler(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`

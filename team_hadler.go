@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/RoshiSecOps/goATED-tracker/internal/auth"
-	"github.com/RoshiSecOps/goATED-tracker/internal/database"
 	"github.com/google/uuid"
 )
 
@@ -80,14 +79,23 @@ func (cfg *apiConfig) getTeamsHandler(w http.ResponseWriter, r *http.Request) {
 		formattedTeams = append(formattedTeams, databaseTeamtoTeam(team))
 	}
 	respondWithJSON(w, 200, formattedTeams)
-
 }
 
-func databaseTeamtoTeam(dbTeam database.Team) Team {
-	return Team{
-		ID:        dbTeam.ID,
-		CreatedAt: dbTeam.CreatedAt,
-		UpdatedAt: dbTeam.UpdatedAt,
-		Name:      dbTeam.Teamname,
+func (cfg *apiConfig) wipeTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 401, "wrong/malformed auth header")
+		return
 	}
+	_, err = auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 401, "unable to validate jwt")
+		return
+	}
+	err = cfg.db.WipeTeams(r.Context())
+	if err != nil {
+		respondWithError(w, 401, "teams not reset")
+	}
+	respondWithJSON(w, 204, "")
 }
