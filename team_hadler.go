@@ -99,3 +99,26 @@ func (cfg *apiConfig) wipeTeamsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, 204, "")
 }
+
+func (cfg *apiConfig) getTeamHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 401, "wrong/malformed auth header")
+		return
+	}
+	_, err = auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 401, "unable to validate jwt")
+		return
+	}
+
+	teamName := r.PathValue("teamName")
+
+	team, err := cfg.db.GetTeamByName(r.Context(), teamName)
+	if err != nil {
+		respondWithError(w, 404, "Team not found")
+		return
+	}
+	respondWithJSON(w, 200, databaseTeamtoTeam(team))
+}

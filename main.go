@@ -39,6 +39,7 @@ func main() {
 	mux.HandleFunc("POST /api/admin/teams", apiCfg.createTeamHandler)
 	mux.HandleFunc("GET /api/admin/teams", apiCfg.getTeamsHandler)
 	mux.HandleFunc("DELETE /api/admin/teams", apiCfg.wipeTeamsHandler)
+	mux.HandleFunc("GET /api/admin/teams/{TeamName}", apiCfg.getTeamHandler)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()
 }
