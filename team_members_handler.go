@@ -72,3 +72,26 @@ func (cfg *apiConfig) addMember(w http.ResponseWriter, r *http.Request) {
 		TeamID:    teamMember.TeamID,
 	})
 }
+
+func (cfg *apiConfig) getTeamsMembersHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("ADMIN_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 401, "wrong/malformed auth header")
+		return
+	}
+	if token != secret {
+		respondWithError(w, 401, "unable to validate jwt")
+		return
+	}
+	teamsMembers, err := cfg.db.GetAllTeamMember(r.Context())
+	if err != nil {
+		respondWithError(w, 404, "cannot get all teams and members")
+		return
+	}
+	listTeamsMembers := []TeamMember{}
+	for _, teamMem := range teamsMembers {
+		listTeamsMembers = append(listTeamsMembers, databaseTeamMembersToTeamMembers(teamMem))
+	}
+	respondWithJSON(w, 200, listTeamsMembers)
+}

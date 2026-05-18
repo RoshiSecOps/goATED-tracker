@@ -31,3 +31,13 @@ func databaseTeamtoTeam(dbTeam database.Team) Team {
 		Name:      dbTeam.Teamname,
 	}
 }
+
+func databaseTeamMembersToTeamMembers(dbTeamMembers database.TeamMember) TeamMember {
+	return TeamMember{
+		ID:        dbTeamMembers.ID,
+		CreatedAt: dbTeamMembers.CreatedAt,
+		UpdatedAt: dbTeamMembers.UpdatedAt,
+		UserID:    dbTeamMembers.UserID,
+		TeamID:    dbTeamMembers.TeamID,
+	}
+}
