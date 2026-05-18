@@ -95,3 +95,22 @@ func (cfg *apiConfig) getTeamsMembersHandler(w http.ResponseWriter, r *http.Requ
 	}
 	respondWithJSON(w, 200, listTeamsMembers)
 }
+
+func (cfg *apiConfig) wipeTeamsMembersHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("ADMIN_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 401, "wrong/malformed auth header")
+		return
+	}
+	if token != secret {
+		respondWithError(w, 401, "unable to validate jwt")
+		return
+	}
+	err = cfg.db.WipeTeamMember(r.Context())
+	if err != nil {
+		respondWithError(w, 500, "could not wipe teams members table")
+		return
+	}
+	respondWithJSON(w, 204, "")
+}
