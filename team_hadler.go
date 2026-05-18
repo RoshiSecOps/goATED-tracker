@@ -22,14 +22,13 @@ func (cfg *apiConfig) createTeamHandler(w http.ResponseWriter, r *http.Request) 
 	type parameters struct {
 		Teamname string `json:"teamname"`
 	}
-	secret := os.Getenv("JWT_SECRET")
+	secret := os.Getenv("ADMIN_SECRET")
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, 401, "wrong/malformed auth header")
 		return
 	}
-	_, err = auth.ValidateJWT(token, secret)
-	if err != nil {
+	if token != secret {
 		respondWithError(w, 401, "unable to validate jwt")
 		return
 	}
@@ -59,14 +58,13 @@ func (cfg *apiConfig) createTeamHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (cfg *apiConfig) getTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	secret := os.Getenv("JWT_SECRET")
+	secret := os.Getenv("ADMIN_SECRET")
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, 401, "wrong/malformed auth header")
 		return
 	}
-	_, err = auth.ValidateJWT(token, secret)
-	if err != nil {
+	if token != secret {
 		respondWithError(w, 401, "unable to validate jwt")
 		return
 	}
@@ -82,14 +80,13 @@ func (cfg *apiConfig) getTeamsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) wipeTeamsHandler(w http.ResponseWriter, r *http.Request) {
-	secret := os.Getenv("JWT_SECRET")
+	secret := os.Getenv("ADMIN_SECRET")
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, 401, "wrong/malformed auth header")
 		return
 	}
-	_, err = auth.ValidateJWT(token, secret)
-	if err != nil {
+	if token != secret {
 		respondWithError(w, 401, "unable to validate jwt")
 		return
 	}
@@ -101,14 +98,13 @@ func (cfg *apiConfig) wipeTeamsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) getTeamHandler(w http.ResponseWriter, r *http.Request) {
-	secret := os.Getenv("JWT_SECRET")
+	secret := os.Getenv("ADMIN_SECRET")
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, 401, "wrong/malformed auth header")
 		return
 	}
-	_, err = auth.ValidateJWT(token, secret)
-	if err != nil {
+	if token != secret {
 		respondWithError(w, 401, "unable to validate jwt")
 		return
 	}
