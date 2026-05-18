@@ -9,11 +9,15 @@ VALUES (
 RETURNING *;
 
 -- name: GetAllTeams :many
-SELECT * from teams;
+SELECT * FROM teams;
 
 -- name: GetTeamByName :one
-SELECT * from teams
+SELECT * FROM teams
 Where teamname = $1;
 
 -- name: WipeTeams :exec
 DELETE FROM teams;
+
+-- name: GetTeamIDByName :one
+SELECT * FROM teams
+WHERE teamname = $1;

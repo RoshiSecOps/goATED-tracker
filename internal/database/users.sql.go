@@ -57,6 +57,24 @@ func (q *Queries) GetUserByName(ctx context.Context, username string) (User, err
 	return i, err
 }
 
+const getUserIDByName = `-- name: GetUserIDByName :one
+SELECT id, created_at, updated_at, username, passwordhash FROM users
+WHERE username = $1
+`
+
+func (q *Queries) GetUserIDByName(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserIDByName, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Username,
+		&i.Passwordhash,
+	)
+	return i, err
+}
+
 const wipeUsers = `-- name: WipeUsers :exec
 DELETE FROM users
 `

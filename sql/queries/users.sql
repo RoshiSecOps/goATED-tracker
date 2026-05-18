@@ -15,3 +15,7 @@ DELETE FROM users;
 -- name: GetUserByName :one
 SELECT * FROM users
 WHERE username = $1;
+
+-- name: GetUserIDByName :one
+SELECT * FROM users
+WHERE username = $1;
