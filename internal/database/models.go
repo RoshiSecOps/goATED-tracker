@@ -17,6 +17,14 @@ type Team struct {
 	Teamname  string
 }
 
+type TeamMember struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+	TeamID    uuid.UUID
+}
+
 type User struct {
 	ID           uuid.UUID
 	CreatedAt    time.Time
