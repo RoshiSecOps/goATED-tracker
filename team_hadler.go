@@ -109,7 +109,7 @@ func (cfg *apiConfig) getTeamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	teamName := r.PathValue("teamName")
+	teamName := r.PathValue("TeamName")
 
 	team, err := cfg.db.GetTeamByName(r.Context(), teamName)
 	if err != nil {
