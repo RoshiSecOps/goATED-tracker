@@ -74,26 +74,27 @@ func (q *Queries) GetAllTeamMember(ctx context.Context) ([]TeamMember, error) {
 	return items, nil
 }
 
-const getTeamsByUser = `-- name: GetTeamsByUser :many
-SELECT id, created_at, updated_at, user_id, team_id FROM team_members
-WHERE user_id = $1
+const getTeamsForUser = `-- name: GetTeamsForUser :many
+SELECT teams.id, teams.created_at, teams.updated_at, teams.teamname 
+FROM teams
+JOIN team_members ON teams.id = team_members.team_id
+WHERE team_members.user_id = $1
 `
 
-func (q *Queries) GetTeamsByUser(ctx context.Context, userID uuid.UUID) ([]TeamMember, error) {
-	rows, err := q.db.QueryContext(ctx, getTeamsByUser, userID)
+func (q *Queries) GetTeamsForUser(ctx context.Context, userID uuid.UUID) ([]Team, error) {
+	rows, err := q.db.QueryContext(ctx, getTeamsForUser, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TeamMember
+	var items []Team
 	for rows.Next() {
-		var i TeamMember
+		var i Team
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.UserID,
-			&i.TeamID,
+			&i.Teamname,
 		); err != nil {
 			return nil, err
 		}

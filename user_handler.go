@@ -67,7 +67,17 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (cfg *apiConfig) wipeUsersHandler(w http.ResponseWriter, r *http.Request) {
-	err := cfg.db.WipeUsers(r.Context())
+	secret := os.Getenv("ADMIN_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 401, "wrong/malformed auth header")
+		return
+	}
+	if token != secret {
+		respondWithError(w, 401, "unable to validate jwt")
+		return
+	}
+	err = cfg.db.WipeUsers(r.Context())
 	if err != nil {
 		respondWithError(w, 500, "could not delete users")
 		log.Printf("error wiping users: %v", err)
@@ -144,10 +154,10 @@ func (cfg *apiConfig) getUserTeamsHandler(w http.ResponseWriter, r *http.Request
 		respondWithError(w, 400, "unable to validate jwt")
 		return
 	}
-	teams, err := cfg.db.GetTeamsByUser(r.Context(), userId)
-	formattedTeams := []TeamMember{}
+	teams, err := cfg.db.GetTeamsForUser(r.Context(), userId)
+	formattedTeams := []Team{}
 	for _, team := range teams {
-		formattedTeams = append(formattedTeams, databaseTeamMembersToTeamMembers(team))
+		formattedTeams = append(formattedTeams, databaseTeamtoTeam(team))
 	}
 	respondWithJSON(w, 200, formattedTeams)
 }
