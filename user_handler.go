@@ -131,3 +131,23 @@ func (cfg *apiConfig) userLoginHandler(w http.ResponseWriter, r *http.Request) {
 		Token: jwtToken,
 	})
 }
+
+func (cfg *apiConfig) getUserTeamsHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 500, "unable to get auth token")
+		return
+	}
+	userId, err := auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 400, "unable to validate jwt")
+		return
+	}
+	teams, err := cfg.db.GetTeamsByUser(r.Context(), userId)
+	formattedTeams := []TeamMember{}
+	for _, team := range teams {
+		formattedTeams = append(formattedTeams, databaseTeamMembersToTeamMembers(team))
+	}
+	respondWithJSON(w, 200, formattedTeams)
+}

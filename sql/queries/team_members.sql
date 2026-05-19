@@ -14,3 +14,7 @@ SELECT * FROM team_members;
 
 -- name: WipeTeamMember :exec
 DELETE FROM team_members;
+
+-- name: GetTeamsByUser :many
+SELECT * FROM team_members
+WHERE user_id = $1;

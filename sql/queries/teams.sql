@@ -13,7 +13,7 @@ SELECT * FROM teams;
 
 -- name: GetTeamByName :one
 SELECT * FROM teams
-Where teamname = $1;
+WHERE teamname = $1;
 
 -- name: WipeTeams :exec
 DELETE FROM teams;

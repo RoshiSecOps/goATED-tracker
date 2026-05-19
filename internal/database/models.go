@@ -10,6 +10,27 @@ import (
 	"github.com/google/uuid"
 )
 
+type Finding struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Title         string
+	Severity      string
+	SeverityScore int32
+	File          string
+	AtLine        int32
+	Description   string
+	PentestID     uuid.UUID
+}
+
+type Pentest struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Title     string
+	TeamID    uuid.UUID
+}
+
 type Team struct {
 	ID        uuid.UUID
 	CreatedAt time.Time

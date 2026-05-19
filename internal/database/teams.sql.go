@@ -66,7 +66,7 @@ func (q *Queries) GetAllTeams(ctx context.Context) ([]Team, error) {
 
 const getTeamByName = `-- name: GetTeamByName :one
 SELECT id, created_at, updated_at, teamname FROM teams
-Where teamname = $1
+WHERE teamname = $1
 `
 
 func (q *Queries) GetTeamByName(ctx context.Context, teamname string) (Team, error) {

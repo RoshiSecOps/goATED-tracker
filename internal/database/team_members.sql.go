@@ -74,6 +74,40 @@ func (q *Queries) GetAllTeamMember(ctx context.Context) ([]TeamMember, error) {
 	return items, nil
 }
 
+const getTeamsByUser = `-- name: GetTeamsByUser :many
+SELECT id, created_at, updated_at, user_id, team_id FROM team_members
+WHERE user_id = $1
+`
+
+func (q *Queries) GetTeamsByUser(ctx context.Context, userID uuid.UUID) ([]TeamMember, error) {
+	rows, err := q.db.QueryContext(ctx, getTeamsByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TeamMember
+	for rows.Next() {
+		var i TeamMember
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.UserID,
+			&i.TeamID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const wipeTeamMember = `-- name: WipeTeamMember :exec
 DELETE FROM team_members
 `
