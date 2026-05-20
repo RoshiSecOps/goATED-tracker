@@ -44,6 +44,8 @@ func main() {
 	mux.HandleFunc("GET /api/admin/teams/members", apiCfg.getTeamsMembersHandler)
 	mux.HandleFunc("DELETE /api/admin/teams/members", apiCfg.wipeTeamsMembersHandler)
 	mux.HandleFunc("POST /api/admin/teams/pentests", apiCfg.addPentestHandler)
+	mux.HandleFunc("GET /api/admin/teams/pentests", apiCfg.getPentestsHandler)
+	mux.HandleFunc("DELETE /api/admin/teams/pentests", apiCfg.wipePentestsHandler)
 	mux.HandleFunc("GET /api/users/teams", apiCfg.getUserTeamsHandler)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()

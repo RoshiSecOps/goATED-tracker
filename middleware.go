@@ -41,3 +41,13 @@ func databaseTeamMembersToTeamMembers(dbTeamMembers database.TeamMember) TeamMem
 		TeamID:    dbTeamMembers.TeamID,
 	}
 }
+
+func databasePentesttoPentest(dbPentest database.Pentest) Pentest {
+	return Pentest{
+		ID:        dbPentest.ID,
+		CreatedAt: dbPentest.CreatedAt,
+		UpdatedAt: dbPentest.CreatedAt,
+		Title:     dbPentest.Title,
+		TeamID:    dbPentest.TeamID,
+	}
+}
