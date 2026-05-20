@@ -20,7 +20,7 @@ type TeamMember struct {
 	TeamID    uuid.UUID `json:"team_id"`
 }
 
-func (cfg *apiConfig) addMember(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) addMemberHandler(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Teamname string `json:"teamname"`
 		Username string `json:"username"`

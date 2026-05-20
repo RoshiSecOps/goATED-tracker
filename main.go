@@ -40,7 +40,7 @@ func main() {
 	mux.HandleFunc("GET /api/admin/teams", apiCfg.getTeamsHandler)
 	mux.HandleFunc("DELETE /api/admin/teams", apiCfg.wipeTeamsHandler)
 	mux.HandleFunc("GET /api/admin/teams/{TeamName}", apiCfg.getTeamHandler)
-	mux.HandleFunc("POST /api/admin/teams/members", apiCfg.addMember)
+	mux.HandleFunc("POST /api/admin/teams/members", apiCfg.addMemberHandler)
 	mux.HandleFunc("GET /api/admin/teams/members", apiCfg.getTeamsMembersHandler)
 	mux.HandleFunc("DELETE /api/admin/teams/members", apiCfg.wipeTeamsMembersHandler)
 	mux.HandleFunc("POST /api/admin/teams/pentests", apiCfg.addPentestHandler)
