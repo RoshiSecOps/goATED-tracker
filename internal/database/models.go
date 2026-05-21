@@ -15,6 +15,7 @@ type Finding struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	Title         string
+	Status        string
 	Severity      string
 	SeverityScore int32
 	File          string
