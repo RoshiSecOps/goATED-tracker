@@ -51,3 +51,19 @@ func databasePentesttoPentest(dbPentest database.Pentest) Pentest {
 		TeamID:    dbPentest.TeamID,
 	}
 }
+
+func databaseFindingtoFinding(dbFinding database.Finding) Finding {
+	return Finding{
+		ID:            dbFinding.ID,
+		CreatedAt:     dbFinding.CreatedAt,
+		UpdatedAt:     dbFinding.UpdatedAt,
+		Title:         dbFinding.Title,
+		Status:        dbFinding.Status,
+		Severity:      dbFinding.Severity,
+		SeverityScore: int(dbFinding.SeverityScore),
+		File:          dbFinding.File,
+		AtLine:        int(dbFinding.AtLine),
+		Description:   dbFinding.Description,
+		PentestId:     dbFinding.PentestID,
+	}
+}
