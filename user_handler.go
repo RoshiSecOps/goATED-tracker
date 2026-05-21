@@ -161,3 +161,48 @@ func (cfg *apiConfig) getUserTeamsHandler(w http.ResponseWriter, r *http.Request
 	}
 	respondWithJSON(w, 200, formattedTeams)
 }
+
+func (cfg *apiConfig) getTeamPentestsHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 500, "unable to get auth token")
+		return
+	}
+	userId, err := auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 400, "unable to validate jwt")
+		return
+	}
+	teamName := r.PathValue("TeamName")
+	team, err := cfg.db.GetTeamByName(r.Context(), teamName)
+	if err != nil {
+		respondWithError(w, 500, "unable to retrieve team")
+		log.Printf("Error: %v", err)
+		return
+	}
+	test, err := cfg.db.CheckMembership(r.Context(), database.CheckMembershipParams{
+		UserID: userId,
+		TeamID: team.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to check membership")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "not member of the team")
+		return
+	}
+	pentests, err := cfg.db.GetPentestsForTeam(r.Context(), team.ID)
+	if err != nil {
+		respondWithError(w, 500, "unable to fetch pentests")
+		log.Printf("Error: %v", err)
+		return
+	}
+	formattedTests := []Pentest{}
+	for _, pentest := range pentests {
+		formattedTests = append(formattedTests, databasePentesttoPentest(pentest))
+	}
+	respondWithJSON(w, 200, formattedTests)
+}

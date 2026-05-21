@@ -11,6 +11,25 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkMembership = `-- name: CheckMembership :one
+SELECT EXISTS (
+    SELECT 1 FROM team_members
+    WHERE user_id = $1 AND team_id = $2
+)
+`
+
+type CheckMembershipParams struct {
+	UserID uuid.UUID
+	TeamID uuid.UUID
+}
+
+func (q *Queries) CheckMembership(ctx context.Context, arg CheckMembershipParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkMembership, arg.UserID, arg.TeamID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createTeamMember = `-- name: CreateTeamMember :one
 INSERT INTO team_members (id, created_at, updated_at, user_id, team_id)
 VALUES (
