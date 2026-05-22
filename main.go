@@ -34,7 +34,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 	mux.HandleFunc("POST /api/users", apiCfg.createUserHandler)
-	mux.HandleFunc("DELETE /api/users", apiCfg.wipeUsersHandler)
+	mux.HandleFunc("DELETE /api/admin/users", apiCfg.wipeUsersHandler)
 	mux.HandleFunc("POST /api/login", apiCfg.userLoginHandler)
 	mux.HandleFunc("POST /api/admin/teams", apiCfg.createTeamHandler)
 	mux.HandleFunc("GET /api/admin/teams", apiCfg.getTeamsHandler)

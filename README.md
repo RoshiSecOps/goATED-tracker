@@ -40,7 +40,6 @@ go build
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/users` | Create a new user |
-| DELETE | `/api/users` | Wipe all users |
 | POST | `/api/login` | User login |
 | GET | `/api/users/teams` | Get team membership (as a user) |
 
@@ -48,6 +47,7 @@ go build
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| DELETE | `/api/admin/users` | Wipe all users |
 | POST | `/api/admin/teams` | Create a team |
 | GET | `/api/admin/teams` | Get all teams |
 | DELETE | `/api/admin/teams` | Wipe all teams |
