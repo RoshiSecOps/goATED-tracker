@@ -52,6 +52,7 @@ func main() {
 	mux.HandleFunc("GET /api/users/teams", apiCfg.getUserTeamsHandler) // Get Team membership as a user
 	mux.HandleFunc("GET /api/{TeamName}/pentests", apiCfg.getTeamPentestsHandler)
 	mux.HandleFunc("POST /api/{TeamName}/pentests", apiCfg.addTeamPentestsHandler)
+	mux.HandleFunc("POST /api/{TeamName}/pentests/findings", apiCfg.addFindingsUserHandler)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()
 }
