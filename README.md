@@ -33,6 +33,58 @@ go build
 ./goATED-tracker
 ```
 
-## Usage
+## API Endpoints
+
+### Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/users` | Create a new user |
+| DELETE | `/api/users` | Wipe all users |
+| POST | `/api/login` | User login |
+| GET | `/api/users/teams` | Get team membership (as a user) |
+
+### Admin - Teams
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/admin/teams` | Create a team |
+| GET | `/api/admin/teams` | Get all teams |
+| DELETE | `/api/admin/teams` | Wipe all teams |
+| GET | `/api/admin/teams/{TeamName}` | Get a specific team |
+
+### Admin - Members
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/admin/teams/members` | Add a member to a team |
+| GET | `/api/admin/teams/members` | Get all team members |
+| DELETE | `/api/admin/teams/members` | Wipe all team members |
+
+### Admin - Pentests
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/admin/teams/pentests` | Add a pentest |
+| GET | `/api/admin/teams/pentests` | Get all pentests |
+| DELETE | `/api/admin/teams/pentests` | Wipe all pentests |
+
+### Admin - Findings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/admin/findings` | Add a finding |
+| GET | `/api/admin/findings` | Get all findings |
+| DELETE | `/api/admin/findings` | Wipe all findings |
+
+### User - Team Pentests & Findings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/{TeamName}/pentests` | Get pentests for a team |
+| POST | `/api/v1/{TeamName}/pentests` | Add a pentest to a team |
+| POST | `/api/v1/{TeamName}/pentests/findings` | Add a finding to a pentest |
+| GET | `/api/v1/{TeamName}/{PentestTitle}/findings` | Get findings for a pentest |
+| POST | `/api/v1/{TeamName}/{PentestTitle}/findings` | Close findings for a pentest |
 
 
