@@ -91,7 +91,7 @@ func (cfg *apiConfig) getFindingsHandler(w http.ResponseWriter, r *http.Request)
 	}
 	findings, err := cfg.db.GetAllFindings(r.Context())
 	if err != nil {
-		respondWithError(w, 500, "unable to retrieve pentests")
+		respondWithError(w, 500, "unable to retrieve findings")
 		return
 	}
 	formattedFindings := []Finding{}
@@ -203,4 +203,67 @@ func (cfg *apiConfig) addFindingsUserHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	respondWithJSON(w, 201, finding)
+}
+
+func (cfg *apiConfig) getPentestFindingsUserHandler(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 500, "unable to get auth token")
+		return
+	}
+	userId, err := auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 400, "unable to validate jwt")
+		return
+	}
+	teamName := r.PathValue("TeamName")
+	team, err := cfg.db.GetTeamByName(r.Context(), teamName)
+	if err != nil {
+		respondWithError(w, 500, "unable to retrieve team")
+		log.Printf("Error: %v", err)
+		return
+	}
+	test, err := cfg.db.CheckMembership(r.Context(), database.CheckMembershipParams{
+		UserID: userId,
+		TeamID: team.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to check membership")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "not member of the team")
+		return
+	}
+	pentestTitle := r.PathValue("PentestTitle")
+	pentest, err := cfg.db.GetPentestByTitle(r.Context(), pentestTitle)
+	if err != nil {
+		respondWithError(w, 401, "unable to retrieve pentest")
+		return
+	}
+	test, err = cfg.db.CheckPentestAccess(r.Context(), database.CheckPentestAccessParams{
+		ID:     pentest.ID,
+		TeamID: team.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to validate pentest to team mapping")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "pentest report is not owned by the provided team")
+		return
+	}
+	dbFindings, err := cfg.db.GetFindingsForPentest(r.Context(), pentest.ID)
+	if err != nil {
+		respondWithError(w, 500, "unable to retrieve findings")
+		return
+	}
+	formattedFindings := []Finding{}
+	for _, finding := range dbFindings {
+		formattedFindings = append(formattedFindings, databaseFindingtoFinding(finding))
+	}
+	respondWithJSON(w, 200, formattedFindings)
 }
