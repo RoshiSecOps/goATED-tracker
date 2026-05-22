@@ -1,5 +1,8 @@
 # :shield: GoATED Pentest Tracker 
 
+## Project Idea
+A robust API with multiple endpoints that allows tracking of Penetration tests across multiple SWE Teams, along with all vulnerability findings associated with the conducted test. For authentication we use JWTs and there is authorization in place across team <-> member , pentest <-> team and finding <-> pentest. Users are isolated to create records for Penetration tests and findings only to those that are assigned to their respective team.
+
 ## Features
 - Create and log Pentests for distinct team
 - Team memberships and separation of ownership
