@@ -87,4 +87,32 @@ go build
 | GET | `/api/v1/{TeamName}/{PentestTitle}/findings` | Get findings for a pentest |
 | POST | `/api/v1/{TeamName}/{PentestTitle}/findings` | Close findings for a pentest |
 
+### Example Flow
+```bash
+#1. Use /api/login to get the JWT
+curl http://localhost:8080/api/login -d '{"username":"x","password":"y"}' # save the JWT
 
+#2. You need to be a member of a team, this is done via the admin endpoints using the ADMIN_SECRET as a token bearer under Authorization Header.
+curl http://localhost:8080/api/users/teams -H "Authorization: Bearer <yourJWT>" # gives you the teams you are a member of.
+
+#3. Create a Pentest Record for a team.
+curl -X POST http://localhost:8080/api/v1/{TeamName}/pentests -H "Authorization: Bearer <yourJWT>" -d '{"title":"Pentest-Title","team_id":"ID-Of-Team-To-Map-Pentest"}'
+
+#4. Add a Finding to the Pentest Record.
+curl -X POST http://localhost:8080/api/v1/{TeamName}/pentests/findings -H "Authorization: Bearer <yourJWT>" -d '{"title": "SQL Injection in Search Bar", "status": "open", "severity": "critical", "severity_score": 10, "file": "search.go", "at_line": 124, "description": "User input is being concatenated directly into the query string.", "pentest_id": "your-pentest-id"}'
+
+#5. Get All findings for a given pentest.
+curl http://localhost:8080/api/v1/{TeamName}/{PentestTitle}/findings -H "Authorization: Bearer <yourJWT>"
+
+#6. Close a finding.
+curl -X POST http://localhost:8080/api/v1/{TeamName}/{PentestTitle}/findings -H "Authorization: Bearer <yourJWT>" -d '{"finding_id":"Your-Finding-ID"}'
+```
+
+### Add Members to teams via Admin endpoint
+```bash
+#1. Add User to a team:
+curl -X POST http://localhost:8080/api/admin/teams/members -H "Authorization: Bearer <adminToken>" -d '{"teamname":"name-of-team","username":"user-to-add"}'
+
+#2. Create a new team:
+curl -X POST http://localhost:8080/api/admin/teams -H "Authorization: Bearer <adminToken>" -d '{"teamname":"name-of-team"}'
+```
