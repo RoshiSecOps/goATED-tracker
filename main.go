@@ -50,10 +50,10 @@ func main() {
 	mux.HandleFunc("GET /api/admin/findings", apiCfg.getFindingsHandler)
 	mux.HandleFunc("DELETE /api/admin/findings", apiCfg.wipeFindingsHandler)
 	mux.HandleFunc("GET /api/users/teams", apiCfg.getUserTeamsHandler) // Get Team membership as a user
-	mux.HandleFunc("GET /api/{TeamName}/pentests", apiCfg.getTeamPentestsHandler)
-	mux.HandleFunc("POST /api/{TeamName}/pentests", apiCfg.addTeamPentestsHandler)
-	mux.HandleFunc("POST /api/{TeamName}/pentests/findings", apiCfg.addFindingsUserHandler)
-	mux.HandleFunc("GET /api/{TeamName}/{PentestTitle}/findings", apiCfg.getPentestFindingsUserHandler)
+	mux.HandleFunc("GET /api/v1/{TeamName}/pentests", apiCfg.getTeamPentestsHandler)
+	mux.HandleFunc("POST /api/v1/{TeamName}/pentests", apiCfg.addTeamPentestsHandler)
+	mux.HandleFunc("POST /api/v1/{TeamName}/pentests/findings", apiCfg.addFindingsUserHandler)
+	mux.HandleFunc("GET /api/v1/{TeamName}/{PentestTitle}/findings", apiCfg.getPentestFindingsUserHandler)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()
 }

@@ -184,6 +184,7 @@ func (cfg *apiConfig) addFindingsUserHandler(w http.ResponseWriter, r *http.Requ
 	}
 	if !test {
 		respondWithError(w, 401, "pentest report is not owned by the provided team")
+		log.Printf("Error: teamID %v, expected %v", team.ID, params.PentestId)
 		return
 	}
 	finding, err := cfg.db.AddFindingToPentest(r.Context(),
@@ -254,6 +255,7 @@ func (cfg *apiConfig) getPentestFindingsUserHandler(w http.ResponseWriter, r *ht
 	}
 	if !test {
 		respondWithError(w, 401, "pentest report is not owned by the provided team")
+		log.Printf("Error: teamID %v, expected %v", team.ID, pentest.TeamID)
 		return
 	}
 	dbFindings, err := cfg.db.GetFindingsForPentest(r.Context(), pentest.ID)
