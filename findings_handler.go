@@ -269,3 +269,90 @@ func (cfg *apiConfig) getPentestFindingsUserHandler(w http.ResponseWriter, r *ht
 	}
 	respondWithJSON(w, 200, formattedFindings)
 }
+
+func (cfg *apiConfig) closePentestFindingsUserHandler(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		FindingID uuid.UUID `json:"finding_id"`
+	}
+	secret := os.Getenv("JWT_SECRET")
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, 500, "unable to get auth token")
+		return
+	}
+	userId, err := auth.ValidateJWT(token, secret)
+	if err != nil {
+		respondWithError(w, 400, "unable to validate jwt")
+		return
+	}
+	teamName := r.PathValue("TeamName")
+	team, err := cfg.db.GetTeamByName(r.Context(), teamName)
+	if err != nil {
+		respondWithError(w, 500, "unable to retrieve team")
+		log.Printf("Error: %v", err)
+		return
+	}
+	test, err := cfg.db.CheckMembership(r.Context(), database.CheckMembershipParams{
+		UserID: userId,
+		TeamID: team.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to check membership")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "not member of the team")
+		return
+	}
+	pentestTitle := r.PathValue("PentestTitle")
+	pentest, err := cfg.db.GetPentestByTitle(r.Context(), pentestTitle)
+	if err != nil {
+		respondWithError(w, 401, "unable to retrieve pentest")
+		return
+	}
+	test, err = cfg.db.CheckPentestAccess(r.Context(), database.CheckPentestAccessParams{
+		ID:     pentest.ID,
+		TeamID: team.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to validate pentest to team mapping")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "pentest report is not owned by the provided team")
+		log.Printf("Error: teamID %v, expected %v", team.ID, pentest.TeamID)
+		return
+	}
+	dat, err := io.ReadAll(r.Body)
+	if err != nil {
+		respondWithError(w, 500, "could not read request body")
+		return
+	}
+	params := parameters{}
+	err = json.Unmarshal(dat, &params)
+	if err != nil {
+		respondWithError(w, 500, "unable to unmarshal data")
+		return
+	}
+	test, err = cfg.db.CheckFindingAccess(r.Context(), database.CheckFindingAccessParams{
+		ID:        params.FindingID,
+		PentestID: pentest.ID,
+	})
+	if err != nil {
+		respondWithError(w, 500, "unable to validate pentest to finding mapping")
+		log.Printf("Error: %v", err)
+		return
+	}
+	if !test {
+		respondWithError(w, 401, "finding is not part of the provided pentest")
+		return
+	}
+	err = cfg.db.CloseFinding(r.Context(), params.FindingID)
+	if err != nil {
+		respondWithError(w, 400, "unable to close finding")
+		return
+	}
+	respondWithJSON(w, 204, "")
+}

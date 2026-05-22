@@ -25,3 +25,14 @@ SELECT * FROM findings;
 
 -- name: WipeFindings :exec
 DELETE FROM findings;
+
+-- name: CheckFindingAccess :one
+SELECT EXISTS (
+    SELECT 1 FROM findings
+    WHERE id = $1 AND pentest_id = $2
+);
+
+-- name: CloseFinding :exec
+UPDATE findings
+SET status = 'closed', updated_at = NOW()
+WHERE id = $1 AND status != 'closed';

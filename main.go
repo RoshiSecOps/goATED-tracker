@@ -54,6 +54,7 @@ func main() {
 	mux.HandleFunc("POST /api/v1/{TeamName}/pentests", apiCfg.addTeamPentestsHandler)
 	mux.HandleFunc("POST /api/v1/{TeamName}/pentests/findings", apiCfg.addFindingsUserHandler)
 	mux.HandleFunc("GET /api/v1/{TeamName}/{PentestTitle}/findings", apiCfg.getPentestFindingsUserHandler)
+	mux.HandleFunc("POST /api/v1/{TeamName}/{PentestTitle}/findings", apiCfg.closePentestFindingsUserHandler)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	server.ListenAndServe()
 }

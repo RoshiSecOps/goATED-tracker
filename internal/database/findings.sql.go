@@ -69,6 +69,36 @@ func (q *Queries) AddFindingToPentest(ctx context.Context, arg AddFindingToPente
 	return i, err
 }
 
+const checkFindingAccess = `-- name: CheckFindingAccess :one
+SELECT EXISTS (
+    SELECT 1 FROM findings
+    WHERE id = $1 AND pentest_id = $2
+)
+`
+
+type CheckFindingAccessParams struct {
+	ID        uuid.UUID
+	PentestID uuid.UUID
+}
+
+func (q *Queries) CheckFindingAccess(ctx context.Context, arg CheckFindingAccessParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkFindingAccess, arg.ID, arg.PentestID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
+const closeFinding = `-- name: CloseFinding :exec
+UPDATE findings
+SET status = 'closed', updated_at = NOW()
+WHERE id = $1 AND status != 'closed'
+`
+
+func (q *Queries) CloseFinding(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, closeFinding, id)
+	return err
+}
+
 const getAllFindings = `-- name: GetAllFindings :many
 SELECT id, created_at, updated_at, title, status, severity, severity_score, file, at_line, description, pentest_id FROM findings
 `
