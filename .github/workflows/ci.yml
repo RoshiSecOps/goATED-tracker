@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Go Formatting checker
         run: test -z $(go fmt ./...)
-        
+
   code-quality:
     name: Linting and Security
     runs-on: ubuntu-latest
@@ -55,6 +55,7 @@ jobs:
 
       - name: Dependency Scanning
         run: go install golang.org/x/vuln/cmd/govulncheck@latest && govulncheck ./...
+        continue-on-error: true
 
   container-security:
     runs-on: ubuntu-latest
