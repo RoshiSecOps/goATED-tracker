@@ -27,4 +27,4 @@ jobs:
         run: go test ./... -cover
 
       - name: Run Go Formatting checker
-        run: go fmt ./...
+        run: test -z $(go fmt ./...)
