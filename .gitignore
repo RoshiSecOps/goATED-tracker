@@ -1,2 +1,3 @@
 goATED-tracker
 .env
+.docker.env
