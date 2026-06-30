@@ -20,5 +20,8 @@ jobs:
         with:
           go-version: "1.26.1"
 
-      - name: Run Tests
+      - name: Run Unit Tests
         run: go test ./...
+
+      - name: Run Code Coverage
+        run: go test ./... -cover
