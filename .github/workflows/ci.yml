@@ -25,3 +25,6 @@ jobs:
 
       - name: Run Code Coverage
         run: go test ./... -cover
+
+      - name: Run Go Formatting checker
+        run: go fmt ./...
