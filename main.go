@@ -9,22 +9,32 @@ import (
 	"github.com/RoshiSecOps/goATED-tracker/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/pressly/goose/v3"
 )
 
 type apiConfig struct {
 	db *database.Queries
 }
 
+func runMigrations(db *sql.DB) {
+	if err := goose.SetDialect("postgres"); err != nil {
+		log.Fatal(err)
+	}
+	if err := goose.Up(db, "sql/schema"); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Failed to load env: %v", err)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using environment variables")
 	}
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Failed to init database")
 	}
+	runMigrations(db)
 	dbQueries := database.New(db)
 	apiCfg := apiConfig{db: dbQueries}
 	mux := http.NewServeMux()
