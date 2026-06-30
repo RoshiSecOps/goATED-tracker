@@ -1,3 +1,4 @@
+![tests-status](https://github.com/RoshiSecOps/goATED-tracker/actions/workflows/ci.yml/badge.svg)
 # :shield: GoATED Pentest Tracker 
 
 ## Project Idea
