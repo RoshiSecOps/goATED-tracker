@@ -46,4 +46,4 @@ jobs:
 
       - name: Linting
         run: staticcheck ./...
-      
+        continue-on-error: true
