@@ -119,3 +119,13 @@ curl -X POST http://localhost:8080/api/admin/teams/members -H "Authorization: Be
 #2. Create a new team:
 curl -X POST http://localhost:8080/api/admin/teams -H "Authorization: Bearer <adminToken>" -d '{"teamname":"name-of-team"}'
 ```
+
+### Running Locally via Docker Compose
+
+```bash
+git clone https://github.com/RoshiSecOps/goATED-tracker.git
+cd goATED-tracker.git
+# rename the .docker.env-example file to .docker.env and generate your own JWT_SECRET and ADMIN_KEY, for example via 'openssl rand -base64 64'
+docker compose up --build #Starts the API and databes
+```
+Once done, you should be able to use the provided commands with your ADMIN key or via JWT once you login.
