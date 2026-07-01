@@ -1,7 +1,7 @@
 ![tests-status](https://github.com/RoshiSecOps/goATED-tracker/actions/workflows/ci.yml/badge.svg)
 # :shield: GoATED Pentest Tracker 
 
-## Project Idea
+## Description
 A robust API with multiple endpoints that allows tracking of Penetration tests across multiple SWE Teams, along with all vulnerability findings associated with the conducted test. For authentication we use JWTs and there is authorization in place across team <-> member , pentest <-> team and finding <-> pentest. Users are isolated to create records for Penetration tests and findings only to those that are assigned to their respective team.
 
 ## Features
@@ -9,6 +9,9 @@ A robust API with multiple endpoints that allows tracking of Penetration tests a
 - Team memberships and separation of ownership
 - Findings to Pentest mapping and authorization checks
 - Closure of Findings and Pentest Storage for Archiving
+
+## Motivation
+I wanted to build something meaningful in go that can help me track pentesting findings and query/manage them in my day-to-day work. This tool is simple, yet complex enough to do that.
 
 ## Requirements
 - go 1.26.1 or > 
@@ -29,7 +32,7 @@ A robust API with multiple endpoints that allows tracking of Penetration tests a
     - JWT_SECRET: used for signing the tokens
     - ADMIN_SECRET: used to access the admin endpoints
 
-## Installation and usage
+## Usage
 ```bash
 git clone https://github.com/RoshiSecOps/goATED-tracker \
 goose -dir sql/schema postgres "your-db-url" up # initialize the database and run migrations
@@ -121,7 +124,7 @@ curl -X POST http://localhost:8080/api/admin/teams/members -H "Authorization: Be
 curl -X POST http://localhost:8080/api/admin/teams -H "Authorization: Bearer <adminToken>" -d '{"teamname":"name-of-team"}'
 ```
 
-### Running Locally via Docker Compose
+### Quick Start
 
 ```bash
 git clone https://github.com/RoshiSecOps/goATED-tracker.git
@@ -130,3 +133,6 @@ cd goATED-tracker.git
 docker compose up --build #Starts the API and databes
 ```
 Once done, you should be able to use the provided commands with your ADMIN key or via JWT once you login.
+
+### Contributing
+WIP
